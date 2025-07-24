@@ -1,0 +1,120 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+// use meters
+convertToMeters 1.0;
+
+// ---- CHANGE GEOMETRY HERE ----
+radius          0.04;
+length          1.0;
+// ------------------------------
+
+// helper  variables
+n_radial        20;      // cells from centre to wall
+n_theta         20;     // cells around arc (per wedge)
+n_axial         200;    // cells along length
+wedgeAngle      45;     // for arc(s)
+angleRad        #calc "degToRad($wedgeAngle)";
+posy            #calc "$radius*cos($angleRad)";
+posz            #calc "$radius*sin($angleRad)";
+
+vertices
+(
+    // bottom face (x=0)
+    (0 $radius 0)                   // 0 
+    (0 0 $radius)                   // 1
+    (0 -$radius 0)                  // 2
+    (0 0 -$radius)                  // 3
+
+    // top face (x=length)
+    ($length $radius 0)             // 4 
+    ($length 0 $radius)             // 5
+    ($length -$radius 0)            // 6
+    ($length 0 -$radius)            // 7
+    
+    // center points
+    (0 0 0)                         // 8
+    ($length 0 0)                   // 9
+);
+
+blocks
+(
+    // create a quarter of the pipe with structured grading
+    hex (0 1 8 8 4 5 9 9) ($n_radial $n_theta $n_axial) simpleGrading (1 1 1)
+    hex (1 2 8 8 5 6 9 9) ($n_radial $n_theta $n_axial) simpleGrading (1 1 1)
+    hex (2 3 8 8 6 7 9 9) ($n_radial $n_theta $n_axial) simpleGrading (1 1 1)
+    hex (3 0 8 8 7 4 9 9) ($n_radial $n_theta $n_axial) simpleGrading (1 1 1)
+);
+
+edges
+(
+    // Make the outer edges of the wedge circular arcs:
+    arc 0 1 ( 0 $posy $posz )
+    arc 1 2 ( 0 -$posy $posz )
+    arc 2 3 ( 0 -$posy -$posz )
+    arc 3 0 ( 0 $posy -$posz )    
+    
+    arc 4 5 ( $length $posy $posz )
+    arc 5 6 ( $length -$posy $posz )
+    arc 6 7 ( $length -$posy -$posz )
+    arc 7 4 ( $length $posy -$posz )
+    
+);
+
+boundary
+(
+    Outlet
+    {
+        type patch;
+        faces
+        (
+            (0 8 8 1)
+            (1 8 8 2)
+            (2 8 8 3)
+            (3 8 8 0)
+        );
+    }
+  
+    Inlet
+    {
+        type patch;
+        faces
+        (
+            (5 9 9 4)
+            (6 9 9 5)
+            (7 9 9 6)
+            (4 9 9 7)
+        );
+    }
+
+    Walls
+    {
+        type wall;
+        faces
+        (
+            (0 1 5 4)
+            (1 2 5 6)
+            (2 3 7 6)
+            (3 0 4 7)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+

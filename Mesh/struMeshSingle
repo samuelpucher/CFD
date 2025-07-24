@@ -1,0 +1,140 @@
+
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+
+// use meters
+convertToMeters 1.0;
+
+
+// ---- CHANGE GEOMETRY HERE ----
+radius          0.04;
+length          1.0;
+struc_por	0.25;
+// ------------------------------
+
+
+// ---- CHANGE CELLCOUNT HERE ----
+no_cell_length  	300;
+no_cell_rad     	30;
+no_cell_struc		30;
+// ------------------------------
+
+
+// helper  variables
+l_struc         #calc "$radius*$struc_por";	// half of the length of the structured center box
+wedgeAngle      45;     
+angleRad        #calc "degToRad($wedgeAngle)";
+pos	        #calc "$radius*cos($angleRad)";
+//pos	        #calc "$radius*0.707";
+
+
+vertices
+(
+	// Vertices 0 to 7 correpsond to Inlet (x=0)
+	(0 $l_struc  $l_struc) 	//0
+	(0 $pos  $pos ) 		//1
+	(0 $pos -$pos ) 		//2
+	(0 $l_struc -$l_struc ) 	//3
+
+	(0 -$pos  -$pos) 		//4
+	(0 -$l_struc -$l_struc) 	//5
+	(0 -$l_struc $l_struc) 		//6
+	(0 -$pos $pos ) 		//7
+	
+	// Vertices 8 to 15 correpsond to Outlet (x=1)
+	($length $l_struc  $l_struc) 	//8
+	($length $pos  $pos ) 		//9
+	($length $pos -$pos ) 		//10
+	($length $l_struc -$l_struc ) 	//11
+
+	($length -$pos  -$pos) 		//12
+	($length -$l_struc -$l_struc) 	//13
+	($length -$l_struc $l_struc) 	//14
+	($length -$pos $pos ) 		//15
+);
+
+
+blocks
+(
+	hex (1 0 3 2 9 8 11 10) 	($no_cell_rad $no_cell_struc $no_cell_length) simpleGrading (1 1 1)  //0
+	hex (2 3 5 4 10 11 13 12) 	($no_cell_rad $no_cell_struc $no_cell_length) simpleGrading (1 1 1)  //1
+	hex (4 5 6 7 12 13 14 15) 	($no_cell_rad $no_cell_struc $no_cell_length) simpleGrading (1 1 1)  //2
+	hex (7 6 0 1 15 14 8 9) 	($no_cell_rad $no_cell_struc $no_cell_length) simpleGrading (1 1 1)  //3
+	hex (0 6 5 3 8 14 13 11) 	($no_cell_struc $no_cell_struc $no_cell_length) simpleGrading (1 1 1)  //4
+);
+
+
+edges
+(
+	arc 1 2   (0 $radius 0 )
+	arc 2 4   (0 0 -$radius)
+	arc 4 7   (0 -$radius 0)
+	arc 7 1   (0 0 $radius )
+
+	arc 9  10 ($length $radius 0 )
+	arc 10 12 ($length 0 -$radius)
+	arc 12 15 ($length -$radius 0)
+	arc 15 9  ($length 0 $radius )
+);
+
+
+boundary
+(
+	Inlet
+	{
+		type	patch;
+		faces
+		(
+			(0 1 2 3)
+			(3 2 4 5)
+			(5 4 7 6)
+			(6 7 1 0)
+			(0 3 5 6)
+		);
+	}
+	
+	Outlet
+	{
+		type	patch;
+		faces
+		(
+			(8 11 10 9)
+			(11 13 12 10)
+			(13 14 15 12)
+			(14 8 9 15)
+			(8 14 13 11)
+		);
+	}
+	
+	Walls
+	{
+		type	wall;
+		faces
+		(
+			(1 9 10 2)
+			(2 10 12 4)
+			(4 12 15 7)
+			(7 15 9 1)
+		);
+	}
+);
+
+
+mergePatchPairs
+(
+);
+
+
+// ************************************************************************* //

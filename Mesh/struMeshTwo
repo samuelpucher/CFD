@@ -1,0 +1,190 @@
+
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+
+// use meters
+convertToMeters 1.0;
+
+
+// ---- CHANGE GEOMETRY HERE ----
+radius          0.04;
+length          1.0;
+struc_por	0.25;
+// ------------------------------
+
+
+// ---- CHANGE CELLCOUNT HERE ----
+no_cell_length  		300;
+no_cell_rad     		30;
+no_cell_struc			30;
+no_cell_half			#calc "$no_cell_struc/2";
+// ------------------------------
+
+
+// helper  variables
+l_struc         #calc "$radius*$struc_por";	// half of the length of the structured center box
+wedgeAngle      45;     
+angleRad        #calc "degToRad($wedgeAngle)";
+pos	        #calc "$radius*cos($angleRad)";
+
+helpAngle      	22.5;
+helpAngleRad   	#calc "degToRad($helpAngle)";
+hy	        #calc "$radius*cos($helpAngleRad)";
+hz	        #calc "$radius*sin($helpAngleRad)";
+
+vertices
+(
+	// Vertices 0 to 7 correpsond to Inlet (x=0)
+	(0 $l_struc  $l_struc) 			//0
+	(0 $pos  $pos ) 			//1
+	(0 $pos -$pos ) 			//2
+	(0 $l_struc -$l_struc ) 		//3
+
+	(0 -$pos  -$pos) 			//4
+	(0 -$l_struc -$l_struc) 		//5
+	(0 -$l_struc $l_struc) 			//6
+	(0 -$pos $pos ) 			//7
+	
+	// Vertices 8 to 15 correpsond to Outlet (x=1)
+	($length $l_struc  $l_struc) 		//8
+	($length $pos  $pos ) 			//9
+	($length $pos -$pos ) 			//10
+	($length $l_struc -$l_struc ) 		//11
+
+	($length -$pos  -$pos) 			//12
+	($length -$l_struc -$l_struc) 		//13
+	($length -$l_struc $l_struc) 		//14
+	($length -$pos $pos ) 			//15
+	
+	// Vertices for the fluid interface
+	(0 -$radius 0)				//16
+	(0 -$l_struc 0)				//17
+	(0 $l_struc 0)				//18
+	(0 $radius 0)				//19
+	
+	($length -$radius 0)			//20
+	($length -$l_struc 0)			//21
+	($length $l_struc 0)			//22
+	($length $radius 0)			//23
+);
+
+
+blocks
+(
+	hex (1 0 18 19 9 8 22 23) 	($no_cell_rad $no_cell_half $no_cell_length) simpleGrading (1 1 1)  	//0	
+	hex (19 18 3 2 23 22 11 10) 	($no_cell_rad $no_cell_half $no_cell_length) simpleGrading (1 1 1)  	//1
+	hex (2 3 5 4 10 11 13 12) 	($no_cell_rad $no_cell_struc $no_cell_length) simpleGrading (1 1 1)  	//2
+	hex (4 5 17 16 12 13 21 20) 	($no_cell_rad $no_cell_half $no_cell_length) simpleGrading (1 1 1)  	//3
+	hex (16 17 6 7 20 21 14 15) 	($no_cell_rad $no_cell_half $no_cell_length) simpleGrading (1 1 1)  	//4
+	hex (7 6 0 1 15 14 8 9) 	($no_cell_rad $no_cell_struc $no_cell_length) simpleGrading (1 1 1)  	//5
+	hex (0 6 17 18 8 14 21 22) 	($no_cell_struc $no_cell_half $no_cell_length) simpleGrading (1 1 1)  	//6
+	hex (18 17 5 3 22 21 13 11) 	($no_cell_struc $no_cell_half $no_cell_length) simpleGrading (1 1 1)  	//7
+	
+);
+
+
+edges
+(
+	// Inlet (x=0)
+	arc 1 19   (0 $hy $hz )
+	arc 19 2   (0 $hy -$hz )
+	arc 2 4    (0 0 -$radius)
+	arc 4 16   (0 -$hy -$hz)
+	arc 16 7   (0 -$hy $hz)	
+	arc 7 1    (0 0 $radius )
+
+	// Outlet (x=1)
+	arc 9 23   ($length $hy $hz )
+	arc 23 10  ($length $hy -$hz )
+	arc 10 12  ($length 0 -$radius)
+	arc 12 20  ($length -$hy -$hz)
+	arc 20 15  ($length -$hy $hz)	
+	arc 15 9   ($length 0 $radius )
+);
+
+
+boundary
+(
+	InletA
+	{
+		type	patch;
+		faces
+		(
+			(0 1 19 18)
+			(6 7 1 0)
+			(16 7 6 17)
+			(17 6 0 18)
+		);
+	}
+	
+	InletB
+	{
+		type	patch;
+		faces
+		(
+			(18 19 2 3)
+			(3 2 4 5)
+			(17 5 4 16)
+			(17 18 3 5)
+			
+		);
+	}
+	
+	OutletA
+	{
+		type	patch;
+		faces
+		(
+			(8 22 23 9)
+			(8 9 15 14)
+			(14 15 20 21)
+			(8 14 21 22)			
+		);
+	}
+	
+	OutletB
+	{
+		type	patch;
+		faces
+		(
+			(23 22 11 10)
+			(11 13 12 10)
+			(21 20 12 13)
+			(22 21 13 11)
+		);
+	}
+	
+	Walls
+	{
+		type	wall;
+		faces
+		(
+			(1 9 23 19)
+			(19 23 10 2)
+			(2 10 12 4)
+			(4 12 20 16)
+			(16 20 15 7)
+			(7 15 9 1)
+		);
+	}
+);
+
+
+mergePatchPairs
+(
+);
+
+
+// ************************************************************************* //
