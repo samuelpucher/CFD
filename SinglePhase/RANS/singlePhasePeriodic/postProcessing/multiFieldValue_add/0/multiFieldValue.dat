@@ -1,0 +1,13 @@
+# Group0          
+#   - multiFieldValue_add:movingWallEpsilon:areaAverage(Inlet,epsilon)
+#   - multiFieldValue_add:fixedWallsEpsilon:areaAverage(Outlet,epsilon)
+#   - multiFieldValue_add:averageEpsilon:average(epsilon)Mean
+# Operation       : add
+# Time            	Group0            
+0.001             	1.4672960739e-01
+0.002             	1.4651318434e-01
+0.003             	1.4429014263e-01
+0.004             	1.4165654005e-01
+0.005             	1.3899472260e-01
+0.006             	1.3454296318e-01
+0.007             	1.3037241842e-01

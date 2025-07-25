@@ -1,0 +1,49 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+3
+(
+    Inlet
+    {
+        // name            Inlet;
+        type            cyclicAMI; 
+        neighbourPatch  Outlet; 
+        transform       translational; 
+        separationVector (1.0 0 0); // e.g., (0.1 0 0) if your pipe segment is 0.1m long in x-direction
+        nFaces          842;
+        startFace       678061;
+    }
+    Outlet
+    {
+        // name            Outlet;
+        type            cyclicAMI; // Changed to cyclic
+        neighbourPatch  Inlet; // Link back to the inlet
+        transform       translational;
+        separationVector (-1.0 0 0);
+        nFaces          1048;
+        startFace       678903;
+    }
+    Walls
+    {
+        type            wall;
+        nFaces          36830;
+        startFace       679951;
+    }
+)
+
+// ************************************************************************* //

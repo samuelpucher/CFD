@@ -1,0 +1,13 @@
+# Group0          
+#   - multiFieldValue_max:movingWallEpsilon:areaAverage(Inlet,epsilon)
+#   - multiFieldValue_max:fixedWallsEpsilon:areaAverage(Outlet,epsilon)
+#   - multiFieldValue_max:averageEpsilon:average(epsilon)Mean
+# Operation       : max
+# Time            	Group0            
+0.001             	7.6729607391e-02
+0.002             	7.6513184343e-02
+0.003             	7.4290142630e-02
+0.004             	7.1656540047e-02
+0.005             	7.0000000000e-02
+0.006             	7.0000000000e-02
+0.007             	7.0000000000e-02

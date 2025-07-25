@@ -1,0 +1,13 @@
+# Group0          
+#   - multiFieldValue_subtract:movingWallEpsilon:areaAverage(Inlet,epsilon)
+#   - multiFieldValue_subtract:fixedWallsEpsilon:areaAverage(Outlet,epsilon)
+#   - multiFieldValue_subtract:averageEpsilon:average(epsilon)Mean
+# Operation       : subtract
+# Time            	Group0            
+0.001             	-6.7296073906e-03
+0.002             	-6.5131843433e-03
+0.003             	-4.2901426296e-03
+0.004             	-1.6565400469e-03
+0.005             	1.0052773975e-03
+0.006             	5.4570368159e-03
+0.007             	9.6275815832e-03

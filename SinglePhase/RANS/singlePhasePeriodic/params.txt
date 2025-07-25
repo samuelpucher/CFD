@@ -1,0 +1,16 @@
+*	Author: Samuel Pucher
+*	Geom:	- Length: 1000 mm
+*		- Diameter: 80 mm
+*	Description: To make sure that the simulation
+*	works properly, some characteristic turbulent
+*	parameters must be evaluated first
+
+k	0.0023
+I	0.03902
+L	0.07
+
+
+* To make the geometry compatible, rename the following patches
+movingWall -> Inlet
+fixedWalls -> Outlet
+frontAndBack -> Walls

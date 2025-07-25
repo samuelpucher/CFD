@@ -1,0 +1,34 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvOptions;
+}
+
+//meanVelocityControl
+momentumSource
+{
+    type            meanVelocityForce;
+    active          true;
+
+    meanVelocityForceCoeffs
+    {
+        // The target mean velocity vector (e.g., in m/s)
+        Ubar            (1.0 0 0); // Target average velocity of 1.0 m/s in x-direction 
+        fields          (U);
+        selectionMode   all;
+        
+        // cellSet         myPipeVolume; // if you have a specific region defined
+    }
+}
+
+
